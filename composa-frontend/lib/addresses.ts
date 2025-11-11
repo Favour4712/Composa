@@ -42,7 +42,8 @@ export const NETWORKS: Record<number, NetworkConfig> = {
   [BASE_SEPOLIA_ADDRESSES.chainId]: BASE_SEPOLIA_ADDRESSES,
 };
 
-export const DEFAULT_NETWORK = BASE_SEPOLIA_ADDRESSES;
+export const 
+DEFAULT_NETWORK = BASE_SEPOLIA_ADDRESSES;
 
 export function getContractAddress(
   contract: keyof ContractAddresses,

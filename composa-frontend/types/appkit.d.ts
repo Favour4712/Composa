@@ -6,7 +6,10 @@ declare global {
       "appkit-button": React.DetailedHTMLProps<
         React.HTMLAttributes<HTMLElement>,
         HTMLElement
-      >;
+      > & {
+        size?: "sm" | "md" | "lg";
+        balance?: "show" | "hide";
+      };
     }
   }
 }
