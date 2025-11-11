@@ -1,11 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
+import { useAccount, useReadContract } from "wagmi";
+
+import { DEFAULT_NETWORK, getContractAddress } from "@/lib/addresses";
+
+import { strategyNftAbi } from "@/lib/abi";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const { address, isConnected } = useAccount();
+
+  const { data: totalStrategies } = useReadContract({
+    abi: strategyNftAbi,
+    address: getContractAddress("strategyNFT"),
+    functionName: "totalStrategies",
+    chainId: DEFAULT_NETWORK.chainId,
+    query: {
+      staleTime: 15_000,
+    },
+  });
+
+  const totalStrategiesLabel = useMemo(() => {
+    if (typeof totalStrategies === "bigint") {
+      try {
+        return Number(totalStrategies).toLocaleString();
+      } catch {
+        return totalStrategies.toString();
+      }
+    }
+    return "—";
+  }, [totalStrategies]);
+
+  const truncatedAddress = useMemo(() => {
+    if (!address) return "";
+    return `${address.slice(0, 6)}…${address.slice(-4)}`;
+  }, [address]);
 
   return (
     <nav className="fixed top-0 w-full z-50 glassmorphism border-b border-border">
@@ -34,13 +66,23 @@ export default function Navbar() {
             {/* Network Indicator */}
             <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-card border border-border text-xs text-muted-foreground">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              Base Sepolia
+              <span className="font-medium">Base Sepolia</span>
+              <span className="h-4 w-px bg-border/70" aria-hidden="true" />
+              <span className="text-foreground/80">
+                Strategies: {totalStrategiesLabel}
+              </span>
             </div>
 
             {/* Wallet Button */}
             <div className="hidden sm:block">
               <appkit-button />
             </div>
+
+            {isConnected && (
+              <div className="hidden md:flex items-center px-3 py-1.5 rounded-lg bg-card border border-border text-xs font-medium text-foreground/80">
+                {truncatedAddress}
+              </div>
+            )}
 
             {/* Mobile Connect */}
             <div className="sm:hidden">
