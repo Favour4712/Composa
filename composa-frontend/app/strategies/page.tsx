@@ -1,46 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
 import Link from "next/link";
 
 import Navbar from "@/components/navbar";
 import StrategyCard from "@/components/marketplace/strategy-card";
-
-const mockStrategies = [
-  {
-    id: "1",
-    name: "Base Delta Neutral",
-    creator: "0x1234...abcd",
-    apy: 14.2,
-    tvl: 125000,
-    riskLevel: "Moderate",
-    price: 0.85,
-    tags: ["Uniswap V3", "Compound", "Yield"],
-  },
-  {
-    id: "2",
-    name: "Uniswap Concentrated LP",
-    creator: "composa.builder",
-    apy: 18.6,
-    tvl: 82000,
-    riskLevel: "Aggressive",
-    price: 1.05,
-    tags: ["Uniswap V3", "LP", "Active Management"],
-  },
-  {
-    id: "3",
-    name: "Compound Ladder",
-    creator: "yieldlabs.eth",
-    apy: 9.8,
-    tvl: 54000,
-    riskLevel: "Conservative",
-    price: 0.65,
-    tags: ["Compound V3", "Lending"],
-  },
-];
+import { useStrategyList } from "@/lib/hooks/useStrategyData";
 
 export default function StrategiesPage() {
-  const strategies = useMemo(() => mockStrategies, []);
+  const { strategies, isEmpty } = useStrategyList();
 
   return (
     <div className="min-h-screen bg-background">
@@ -49,7 +16,7 @@ export default function StrategiesPage() {
       <main className="pt-20 pb-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto space-y-10">
           <section className="space-y-4">
-            <h1 className="text-3xl font-bold tracking-tight lg:text-4xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold tracking-tight lg:text-4xl bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
               Discover Composable Strategies
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground max-w-3xl">
@@ -73,24 +40,24 @@ export default function StrategiesPage() {
             </div>
           </section>
 
-          <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {strategies.map((strategy) => (
-              <StrategyCard
-                key={strategy.id}
-                strategy={{
-                  id: strategy.id,
-                  name: strategy.name,
-                  creator: strategy.creator,
-                  apy: strategy.apy,
-                  tvl: strategy.tvl,
-                  sharpe: 1.6,
-                  risk: strategy.riskLevel,
-                  price: strategy.price,
-                  tags: strategy.tags,
-                }}
-              />
-            ))}
-          </section>
+          {isEmpty ? (
+            <div className="glassmorphism border border-border rounded-xl p-8 text-center text-muted-foreground">
+              No strategies have been created yet. Be the first to{" "}
+              <Link
+                href="/strategy/builder"
+                className="text-primary hover:underline"
+              >
+                build one
+              </Link>
+              .
+            </div>
+          ) : (
+            <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {strategies.map((strategy) => (
+                <StrategyCard key={strategy.id} strategy={strategy} />
+              ))}
+            </section>
+          )}
         </div>
       </main>
     </div>

@@ -5,19 +5,35 @@ import Link from "next/link"
 import { Copy, Zap } from "lucide-react"
 
 interface Strategy {
-  id: string
-  name: string
-  creator: string
-  apy: number
-  tvl: number
-  sharpeRatio: number
-  forks: number
-  price?: number
-  isListed: boolean
+  id: string;
+  name: string;
+  creator: string;
+  apy?: number;
+  tvl?: number;
+  sharpeRatio?: number;
+  forks?: number;
+  price?: number;
+  isListed?: boolean;
+}
+
+function formatNumber(value?: number) {
+  if (value === undefined || Number.isNaN(value)) return "—";
+  return value.toFixed(2);
+}
+
+function formatTvl(value?: number) {
+  if (!value || Number.isNaN(value)) return "—";
+  if (value >= 1_000_000) {
+    return `${(value / 1_000_000).toFixed(1)}M`;
+  }
+  if (value >= 1_000) {
+    return `${(value / 1_000).toFixed(1)}K`;
+  }
+  return value.toFixed(2);
 }
 
 export default function StrategyCard({ strategy }: { strategy: Strategy }) {
-  const [hoverEffect, setHoverEffect] = useState(false)
+  const [hoverEffect, setHoverEffect] = useState(false);
 
   return (
     <Link href={`/strategy/${strategy.id}`}>
@@ -27,7 +43,7 @@ export default function StrategyCard({ strategy }: { strategy: Strategy }) {
         onMouseLeave={() => setHoverEffect(false)}
       >
         {/* NFT Preview */}
-        <div className="relative h-48 bg-gradient-to-br from-primary/30 via-accent/20 to-background overflow-hidden">
+        <div className="relative h-48 bg-linear-to-br from-primary/30 via-accent/20 to-background overflow-hidden">
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-6xl opacity-20 group-hover:scale-110 transition-transform">◈</div>
           </div>
@@ -40,13 +56,13 @@ export default function StrategyCard({ strategy }: { strategy: Strategy }) {
               </div>
             )}
             <div className="px-2 py-1 rounded-lg bg-accent/20 border border-accent/50 text-xs font-semibold text-accent">
-              {strategy.forks} Forks
+              {strategy.forks ?? 0} Forks
             </div>
           </div>
 
           {/* Hover overlay */}
           {hoverEffect && (
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/40 via-transparent to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-primary/40 via-transparent to-transparent" />
           )}
         </div>
 
@@ -64,15 +80,17 @@ export default function StrategyCard({ strategy }: { strategy: Strategy }) {
           <div className="grid grid-cols-3 gap-2 pt-2 border-t border-border/50">
             <div className="space-y-1">
               <div className="text-xs text-muted-foreground uppercase font-semibold">APY</div>
-              <div className="text-lg font-bold text-primary">{strategy.apy}%</div>
+              <div className="text-lg font-bold text-primary">{formatNumber(strategy.apy)}%</div>
             </div>
             <div className="space-y-1">
               <div className="text-xs text-muted-foreground uppercase font-semibold">TVL</div>
-              <div className="text-lg font-bold text-accent">${(strategy.tvl / 1000).toFixed(0)}K</div>
+              <div className="text-lg font-bold text-accent">${formatTvl(strategy.tvl)}</div>
             </div>
             <div className="space-y-1">
               <div className="text-xs text-muted-foreground uppercase font-semibold">Risk</div>
-              <div className="text-lg font-bold text-green-400">Low</div>
+              <div className="text-lg font-bold text-green-400">
+                {strategy.sharpeRatio ? (strategy.sharpeRatio > 2 ? "Low" : "Moderate") : "Unknown"}
+              </div>
             </div>
           </div>
 
@@ -90,9 +108,9 @@ export default function StrategyCard({ strategy }: { strategy: Strategy }) {
             {strategy.isListed && (
               <button
                 onClick={(e) => {
-                  e.preventDefault()
+                  e.preventDefault();
                 }}
-                className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg hover:shadow-primary/40 transition text-white font-medium text-sm"
+                className="flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-linear-to-r from-primary to-accent hover:shadow-lg hover:shadow-primary/40 transition text-white font-medium text-sm"
               >
                 <Zap size={16} />
                 Buy

@@ -1,47 +1,24 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Navbar from "@/components/navbar"
-import StrategyDetailTabs from "@/components/strategy-detail/strategy-detail-tabs"
-import StrategySidebar from "@/components/strategy-detail/strategy-sidebar"
+import { useMemo, useState } from "react";
+import Navbar from "@/components/navbar";
+import StrategyDetailTabs from "@/components/strategy-detail/strategy-detail-tabs";
+import StrategySidebar from "@/components/strategy-detail/strategy-sidebar";
+import { useStrategyDetail } from "@/lib/hooks/useStrategyData";
 
-export default function StrategyDetailPage({ params }: { params: { id: string } }) {
-  const [activeTab, setActiveTab] = useState("overview")
+export default function StrategyDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const [activeTab, setActiveTab] = useState("overview");
+  const { strategy } = useStrategyDetail(params.id);
 
-  // Mock strategy data
-  const strategy = {
-    id: params.id,
-    name: "Multi-Protocol Harvest Strategy",
-    creator: "yield-master.eth",
-    createdAt: "2024-01-15",
-    description:
-      "A sophisticated yield farming strategy that combines automated liquidity provision across Uniswap V3 and Aave lending to maximize returns while managing risk.",
-    apy: 31.2,
-    tvl: 890000,
-    sharpeRatio: 2.4,
-    forks: 45,
-    price: 1.2,
-    performanceData: [
-      { month: "Jan", return: 5.2 },
-      { month: "Feb", return: 6.1 },
-      { month: "Mar", return: 7.8 },
-      { month: "Apr", return: 8.5 },
-      { month: "May", return: 9.2 },
-      { month: "Jun", return: 11.2 },
-    ],
-    composition: [
-      { step: 1, protocol: "Uniswap V3", action: "Provide Liquidity", tokens: "USDC/ETH", apy: "12%" },
-      { step: 2, protocol: "Aave", action: "Lend", tokens: "ETH", apy: "8%" },
-      { step: 3, protocol: "Compound", action: "Farm", tokens: "COMP", apy: "14%" },
-    ],
-    forkedFrom: null,
-    forkCount: 45,
-    recentActivity: [
-      { type: "deposit", user: "0x1234...5678", amount: 50, time: "2 hours ago" },
-      { type: "withdraw", user: "0x9876...5432", amount: 30, time: "4 hours ago" },
-      { type: "fork", user: "new-trader.eth", amount: 0, time: "1 day ago" },
-    ],
-  }
+  const createdDate = useMemo(() => {
+    if (!strategy?.createdAt) return null;
+    const date = new Date(strategy.createdAt * 1000);
+    return date.toLocaleDateString();
+  }, [strategy?.createdAt]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -53,7 +30,7 @@ export default function StrategyDetailPage({ params }: { params: { id: string } 
             <div className="grid lg:grid-cols-3 gap-8 items-start">
               {/* NFT Preview */}
               <div className="lg:col-span-2">
-                <div className="relative aspect-video rounded-xl glassmorphism border border-border overflow-hidden bg-gradient-to-br from-primary/30 via-accent/20 to-background group cursor-pointer">
+                <div className="relative aspect-video rounded-xl glassmorphism border border-border overflow-hidden bg-linear-to-br from-primary/30 via-accent/20 to-background group cursor-pointer">
                   <div className="absolute inset-0 flex items-center justify-center text-7xl opacity-10 group-hover:opacity-20 transition">
                     ◈
                   </div>
@@ -64,19 +41,37 @@ export default function StrategyDetailPage({ params }: { params: { id: string } 
               <div className="space-y-4">
                 <div className="glassmorphism border border-border p-4 rounded-xl space-y-3">
                   <div>
-                    <div className="text-xs text-muted-foreground uppercase font-semibold mb-1">Strategy Name</div>
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                      {strategy.name}
+                    <div className="text-xs text-muted-foreground uppercase font-semibold mb-1">
+                      Strategy Name
+                    </div>
+                    <h1 className="text-2xl font-bold bg-linear-to-r from-primary to-accent bg-clip-text text-transparent">
+                      {strategy?.name ?? `Strategy #${params.id}`}
                     </h1>
                   </div>
                   <div className="pt-3 border-t border-border/50 space-y-2">
                     <div>
-                      <div className="text-xs text-muted-foreground">Creator</div>
-                      <div className="text-sm font-semibold">{strategy.creator}</div>
+                      <div className="text-xs text-muted-foreground">
+                        Creator
+                      </div>
+                      <div className="text-sm font-semibold">
+                        {strategy?.creator ?? "Unknown"}
+                      </div>
                     </div>
                     <div>
-                      <div className="text-xs text-muted-foreground">Created</div>
-                      <div className="text-sm font-semibold">{strategy.createdAt}</div>
+                      <div className="text-xs text-muted-foreground">
+                        Created
+                      </div>
+                      <div className="text-sm font-semibold">
+                        {createdDate ?? "—"}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-muted-foreground">
+                        Status
+                      </div>
+                      <div className="text-sm font-semibold">
+                        {strategy?.isActive === false ? "Inactive" : "Active"}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -90,14 +85,24 @@ export default function StrategyDetailPage({ params }: { params: { id: string } 
           <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              <StrategyDetailTabs activeTab={activeTab} setActiveTab={setActiveTab} strategy={strategy} />
+              {strategy ? (
+                <StrategyDetailTabs
+                  activeTab={activeTab}
+                  setActiveTab={setActiveTab}
+                  strategy={strategy}
+                />
+              ) : (
+                <div className="glassmorphism border border-border rounded-xl p-10 text-center text-muted-foreground">
+                  Loading strategy data from Base Sepolia…
+                </div>
+              )}
             </div>
 
             {/* Sidebar */}
-            <StrategySidebar strategy={strategy} />
+            {strategy && <StrategySidebar strategy={strategy} />}
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
