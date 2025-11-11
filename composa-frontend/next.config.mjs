@@ -6,6 +6,14 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-}
+  turbopack: {},
+  webpack: (config) => {
+    const externals = config.externals ?? [];
+    config.externals = Array.isArray(externals)
+      ? [...externals, "pino-pretty", "lokijs", "encoding"]
+      : externals;
+    return config;
+  },
+};
 
-export default nextConfig
+export default nextConfig;

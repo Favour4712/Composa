@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Menu, X, Wallet } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import { Menu, X } from "lucide-react";
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <nav className="fixed top-0 w-full z-50 glassmorphism border-b border-border">
@@ -38,13 +38,20 @@ export default function Navbar() {
             </div>
 
             {/* Wallet Button */}
-            <button className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-primary to-accent hover:shadow-lg hover:shadow-primary/50 transition-all text-white font-medium">
-              <Wallet size={18} />
-              <span className="hidden sm:inline">Connect</span>
-            </button>
+            <div className="hidden sm:block">
+              <appkit-button />
+            </div>
+
+            {/* Mobile Connect */}
+            <div className="sm:hidden">
+              <appkit-button size="sm" />
+            </div>
 
             {/* Mobile menu button */}
-            <button onClick={() => setIsOpen(!isOpen)} className="md:hidden p-2 hover:bg-card rounded-lg transition">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="md:hidden p-2 hover:bg-card rounded-lg transition"
+            >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
@@ -61,7 +68,7 @@ export default function Navbar() {
         )}
       </div>
     </nav>
-  )
+  );
 }
 
 function NavLink({ href, children }: { href: string; children: string }) {
@@ -73,13 +80,16 @@ function NavLink({ href, children }: { href: string; children: string }) {
       {children}
       <div className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-accent group-hover:w-full transition-all duration-300" />
     </Link>
-  )
+  );
 }
 
 function MobileNavLink({ href, children }: { href: string; children: string }) {
   return (
-    <Link href={href} className="block px-4 py-2 text-sm font-medium hover:bg-card rounded-lg transition">
+    <Link
+      href={href}
+      className="block px-4 py-2 text-sm font-medium hover:bg-card rounded-lg transition"
+    >
       {children}
     </Link>
-  )
+  );
 }
