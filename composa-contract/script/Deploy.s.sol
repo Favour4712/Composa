@@ -133,7 +133,10 @@ contract DeployScript is Script {
         strategyRunner.registerAdapter(UNISWAP_ROUTER, address(uniswapAdapter));
         console.log("Registered UniswapAdapter");
 
-        strategyRunner.registerAdapter(COMPOUND_COMET, address(compoundAdapter));
+        strategyRunner.registerAdapter(
+            COMPOUND_COMET,
+            address(compoundAdapter)
+        );
         console.log("Registered CompoundAdapter");
 
         // 8. Whitelist Protocols in Registry
@@ -166,77 +169,6 @@ contract DeployScript is Script {
         console.log("  StrategyMarketplace:", address(marketplace));
         console.log("  RoyaltyManager:", address(royaltyManager));
 
-        // Write addresses to file for frontend
-        _writeDeploymentAddresses(
-            address(strategyNFT),
-            address(strategyRegistry),
-            address(strategyExecutor),
-            address(strategyRunner),
-            address(vaultFactory),
-            address(marketplace),
-            address(royaltyManager)
-        );
-    }
-
-    function _writeDeploymentAddresses(
-        address strategyNFT,
-        address strategyRegistry,
-        address strategyExecutor,
-        address strategyRunner,
-        address vaultFactory,
-        address marketplace,
-        address royaltyManager
-    ) internal {
-        string memory json = string(
-            abi.encodePacked(
-                "{\n",
-                '  "network": "base-sepolia",\n',
-                '  "chainId": 84532,\n',
-                '  "contracts": {\n',
-                '    "StrategyNFT": "',
-                _addressToString(strategyNFT),
-                '",\n',
-                '    "StrategyRegistry": "',
-                _addressToString(strategyRegistry),
-                '",\n',
-                '    "StrategyExecutor": "',
-                _addressToString(strategyExecutor),
-                '",\n',
-                '    "StrategyRunner": "',
-                _addressToString(strategyRunner),
-                '",\n',
-                '    "VaultFactory": "',
-                _addressToString(vaultFactory),
-                '",\n',
-                '    "StrategyMarketplace": "',
-                _addressToString(marketplace),
-                '",\n',
-                '    "RoyaltyManager": "',
-                _addressToString(royaltyManager),
-                '"\n',
-                "  }\n",
-                "}"
-            )
-        );
-
-        vm.writeFile("deployments/base-sepolia.json", json);
-        console.log(
-            "\nDeployment addresses saved to: deployments/base-sepolia.json"
-        );
-    }
-
-    function _addressToString(
-        address addr
-    ) internal pure returns (string memory) {
-        bytes memory data = abi.encodePacked(addr);
-        bytes memory alphabet = "0123456789abcdef";
-        bytes memory str = new bytes(2 + data.length * 2);
-        str[0] = "0";
-        str[1] = "x";
-        for (uint256 i = 0; i < data.length; i++) {
-            str[2 + i * 2] = alphabet[uint8(data[i] >> 4)];
-            str[3 + i * 2] = alphabet[uint8(data[i] & 0x0f)];
-        }
-        return string(str);
+        // For logging purposes only; file writing removed for script compatibility
     }
 }
